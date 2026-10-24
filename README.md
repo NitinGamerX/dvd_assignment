@@ -45,6 +45,44 @@ Worked example: A = 7, from the last digit of roll number 2024112012 (Vishnubhot
 
 ## Part B — Logic synthesis
 
+Script: `synth/synth.tcl` (read RTL → `synth -flatten` → `dfflibmap` → `abc` → `opt_clean` → `stat` → `write_verilog`), using `sky130_fd_sc_hd__tt_025C_1v80.lib`.
+
+Commands, in order:
+
+```bash
+yosys -c synth/synth.tcl
+CELLS=$PDK_ROOT/sky130A/libs.ref/sky130_fd_sc_hd/verilog
+iverilog -g2012 -DFUNCTIONAL -DUNIT_DELAY=#1 -o gls \
+    tb/tb_mult.v $CELLS/primitives.v $CELLS/sky130_fd_sc_hd.v synth/mult_array_netlist.v
+vvp gls
+```
+
+Outputs: `synth/mult_array_netlist.v`, `synth/mult_array_stat.rpt`.
+
+| Metric | Value |
+|---|---|
+| Total cells | 67 |
+| Flip-flops | 16 (`sky130_fd_sc_hd__dfrtp_1`) |
+| Total cell area | 784.502 µm² |
+| Flip-flop area | 400.384 µm² (51.04 %) |
+| Top 3 cell types | dfrtp_1 (16), nand2_1 (9), xnor2_1 (7) |
+
+Gate-level simulation result:
+
+```
+PASS: 256 vectors checked, 0 errors
+```
+
 ## Part C — Static timing analysis
+
+Script: `sta/sta.tcl` reads the typical-corner library (`sky130_fd_sc_hd__tt_025C_1v80.lib`) and the synthesised netlist, defines the clock on `clk`, and sets 1.0 ns input and output delays.
+
+Command:
+
+```bash
+sta sta/sta.tcl
+```
+
+Run 1 (T = 10 ns): worst setup slack = 7.02 ns, so Tmin = 10 − 7.02 = 2.98 ns and Fmax = 1000 / 2.98 = 335.57 MHz.
 
 ## Part D — Physical design
