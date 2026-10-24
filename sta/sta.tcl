@@ -5,7 +5,7 @@ read_liberty $lib
 read_verilog synth/mult_array_netlist.v
 link_design mult_array
 
-create_clock -name clk -period 10.0 [get_ports clk]
+create_clock -name clk -period 2.98 [get_ports clk]
 set_input_delay 1.0 -clock clk [delete_from_list [all_inputs] [get_ports clk]]
 set_output_delay 1.0 -clock clk [all_outputs]
 

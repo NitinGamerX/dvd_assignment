@@ -85,4 +85,33 @@ sta sta/sta.tcl
 
 Run 1 (T = 10 ns): worst setup slack = 7.02 ns, so Tmin = 10 − 7.02 = 2.98 ns and Fmax = 1000 / 2.98 = 335.57 MHz.
 
+Run 2 (T = Tmin = 2.98 ns, period changed in `create_clock`): worst setup slack = 0.000 ns (MET).
+
+Critical path (path group `clk`, from `sta/mult_array_timing.rpt`): start point `_106_` = `b_reg[0]`, end point `_100_` = `p[6]` (its D input is `fa3_3.sum`).
+
+| # | Instance | Cell | Delay (ns) | Arrival (ns) |
+|---|---|---|---|---|
+| — | `_106_` (launch) | `dfrtp_1` clock-to-Q | 0.411 | 0.411 |
+| 1 | `_048_` | `and4_1` | 0.218 | 0.629 |
+| 2 | `_050_` | `a2111oi_0` | 0.428 | 1.057 |
+| 3 | `_051_` | `a21oi_1` | 0.094 | 1.151 |
+| 4 | `_053_` | `mux2i_1` | 0.218 | 1.369 |
+| 5 | `_069_` | `xnor3_1` | 0.374 | 1.742 |
+| 6 | `_074_` | `maj3_1` | 0.371 | 2.113 |
+| 7 | `_076_` | `maj3_1` | 0.376 | 2.489 |
+| 8 | `_080_` | `xor3_1` | 0.355 | 2.844 |
+| — | `_100_` (capture) | `dfrtp_1` setup time | 0.136 | 2.980 |
+
+| Metric | Value |
+|---|---|
+| Worst slack at T = 10 ns | 7.02 ns |
+| Tmin | 2.98 ns |
+| Fmax | 335.57 MHz |
+| Slack at T = Tmin | 0.000 ns |
+| Critical path start point | `b_reg[0]` (`_106_`) |
+| Critical path end point | `p[6]` (`_100_`) |
+| Logic cells on the critical path | 8 |
+| Latency = 2 × Tmin | 5.96 ns |
+| Throughput | 335.57 million results per second |
+
 ## Part D — Physical design
