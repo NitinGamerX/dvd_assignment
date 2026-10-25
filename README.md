@@ -136,3 +136,38 @@ All 80 stages ran. DRC: 0 errors (routing, Magic and KLayout). LVS: circuits mat
 | `nom_ss_100C_1v60` (slow) | −1.926 |
 
 The flow stopped with "Setup violations found" at the three `ss_100C_1v60` corners only. By default, LibreLane's signoff checks every PDK corner, while Part C analysed the typical corner only.
+
+### Attempt 2 (CLOCK_PERIOD = 4.0 ns, final)
+
+Added `"TIMING_VIOLATION_CORNERS": ["*tt*"]` to `pnr/config.json`, so the signoff timing check uses the typical corner, the same corner as Part C. STA still runs at every corner, and every corner's slack is still reported in `metrics.json`. Result: `Flow complete.` DRC 0, LVS 0 (circuits match uniquely), antenna passed, no hold violations. The ss-corner setup violations remain as warnings.
+
+Commands (inside the container, from `pnr/`):
+
+```bash
+rm -rf runs
+librelane config.json
+R=$(ls -d runs/RUN_* | tail -1)
+cp -f $R/final/metrics.json .
+cp -f $R/final/gds/mult_array.gds .
+```
+
+### Part D results
+
+| Metric | Value |
+|---|---|
+| CLOCK_PERIOD used | 4.0 ns |
+| Number of runs needed | 2 |
+| Die area / core area | 22500 µm² (150 × 150 µm) / 17759.5 µm² |
+| Cells after synthesis (Part B) | 67 |
+| Cells after place and route | 1898 |
+| Cells added by the flow | decap 1293, filler 257, well tap 245, timing-repair buffers 32, clock-tree buffers 3 |
+| Wirelength (detailed route) | 2378 µm |
+| Setup slack (`nom_tt_025C_1v80`) | +0.883 ns |
+| Post-route Fmax = 1000 / (4.0 − 0.883) | 320.8 MHz |
+| Fmax from Part C | 335.57 MHz |
+| DRC errors | 0 |
+| LVS errors | 0 |
+
+Setup slack at the other nominal corners: `nom_ff_n40C_1v95` +1.975 ns, `nom_ss_100C_1v60` −1.926 ns.
+
+LibreLane runs its own synthesis, which gives 68 cells (4 inverters, 16 flip-flops, 48 combinational) instead of 67; 1898 − 68 = 1830 cells were added during place and route.
