@@ -115,3 +115,24 @@ Critical path (path group `clk`, from `sta/mult_array_timing.rpt`): start point 
 | Throughput | 335.57 million results per second |
 
 ## Part D — Physical design
+
+Configuration: `pnr/config.json` with `DESIGN_NAME` = `mult_array`, both RTL files, `CLOCK_PORT` = `clk`, `CLOCK_PERIOD` = 4.0 ns (1.2 × Tmin = 1.2 × 2.98 = 3.576 ns, rounded up to the next 0.5 ns), `FP_SIZING` = `absolute`, `DIE_AREA` = [0, 0, 150, 150].
+
+Command (inside the container, from `pnr/`):
+
+```bash
+cd pnr
+librelane config.json
+```
+
+### Attempt 1 (CLOCK_PERIOD = 4.0 ns)
+
+All 80 stages ran. DRC: 0 errors (routing, Magic and KLayout). LVS: circuits match uniquely, 0 errors. Antenna: passed. Setup slack at the nominal corners:
+
+| Corner | Setup slack (ns) |
+|---|---|
+| `nom_tt_025C_1v80` (typical, as in Part C) | +0.883 |
+| `nom_ff_n40C_1v95` (fast) | +1.975 |
+| `nom_ss_100C_1v60` (slow) | −1.926 |
+
+The flow stopped with "Setup violations found" at the three `ss_100C_1v60` corners only. By default, LibreLane's signoff checks every PDK corner, while Part C analysed the typical corner only.
